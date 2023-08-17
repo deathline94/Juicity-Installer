@@ -63,8 +63,6 @@ print_with_delay ""
 echo ""
 echo ""
 
-#!/bin/bash
-
 # Install required packages
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
@@ -78,6 +76,12 @@ wget -O $DESTINATION_PATH $DOWNLOAD_LINK
 
 # Unzip the downloaded file to /root/juicity
 unzip $DESTINATION_PATH -d /root/juicity
+
+if [[ ! -f /root/juicity/juicity-server ]]; then
+    echo "Error: juicity-server binary not found!"
+    exit 1
+fi
+
 
 # Make the binary executable (assuming it's named juicity-server in the unzipped directory)
 chmod +x /root/juicity/juicity-server
