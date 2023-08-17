@@ -13,8 +13,11 @@ else
     exit 1
 fi
 
-# Direct URL for the latest release asset based on the repository structure
-LATEST_RELEASE_URL="https://github.com/juicity/juicity/releases/latest/download/${BINARY_NAME}"
+# Fetch the latest release JSON from the GitHub API
+LATEST_RELEASE_JSON=$(curl --silent "https://api.github.com/repos/juicity/juicity/releases/latest")
+
+# Extract the download URL of the desired asset using jq
+LATEST_RELEASE_URL=$(echo "$LATEST_RELEASE_JSON" | jq -r ".assets[] | select(.name == \"${BINARY_NAME}\") | .browser_download_url")
 
 # Download the binary
 curl -L "$LATEST_RELEASE_URL" -o "/root/juicity/juicity.zip"
