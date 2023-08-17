@@ -13,7 +13,9 @@ else
     exit 1
 fi
 
-LATEST_RELEASE_URL=$(curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r ".[0].assets[] | select(.name == '${BINARY_NAME}') | .browser_download_url")
+# Fetch the release page and extract the latest release's asset URL using grep, awk, and sed
+LATEST_RELEASE_URL=$(curl --silent "https://github.com/juicity/juicity/releases/latest" | grep -Eo "https://github.com/juicity/juicity/releases/download/[^\"]+/${BINARY_NAME}\"" | sed 's/\"$//')
+
 
 # Download and extract to /root/juicity
 mkdir -p /root/juicity
