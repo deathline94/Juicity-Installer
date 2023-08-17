@@ -141,6 +141,7 @@ EOL
 sudo systemctl daemon-reload
 sudo systemctl enable juicity
 sudo systemctl start juicity
+sudo systemctl restart juicity
 
 # Generate and print the share link
 SHARE_LINK=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
