@@ -4,13 +4,12 @@
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
 
-# The specific URL you've provided
+# Always download the specific URL for Linux system
 LATEST_RELEASE_URL="https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
-
-# Download the binary
 curl -L "$LATEST_RELEASE_URL" -o "/root/juicity/juicity.zip"
 
-# Download and extract to /root/juicity
+# Extract the zip file to /root/juicity
+mkdir -p /root/juicity
 unzip /root/juicity/juicity.zip -d /root/juicity
 
 # Delete all files except juicity-server
