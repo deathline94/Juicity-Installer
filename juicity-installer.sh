@@ -1,35 +1,34 @@
 #!/bin/bash
 
-# Install required packages
+# ---- Install required packages ----
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
 
-# Always download the specific URL for Linux system
+# ---- Download the binary ----
 LATEST_RELEASE_URL="https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
 curl -L "$LATEST_RELEASE_URL" -o "/root/juicity/juicity.zip"
 
-# Extract the zip file to /root/juicity
+# ---- Extract the binary ----
 mkdir -p /root/juicity
 unzip /root/juicity/juicity.zip -d /root/juicity
 
-# Delete all files except juicity-server
+# ---- Cleanup: Delete all files except juicity-server ----
 find /root/juicity ! -name 'juicity-server' -type f -exec rm -f {} +
 
-# Set permissions
+# ---- Set permissions ----
 chmod +x /root/juicity/juicity-server
 
-# Create config.json
+# ---- Generate config file ----
 read -p "Enter listen port (or press enter to randomize): " PORT
 [[ -z "$PORT" ]] && PORT=$((RANDOM % 65500 + 1))
 read -p "Enter password: " PASSWORD
 UUID=$(uuidgen)
 
-# Generate private key
+# Generate private key and certificate
 openssl ecparam -genkey -name prime256v1 -out /root/juicity/private.key
-
-# Generate certificate using the private key
 openssl req -new -x509 -days 36500 -key /root/juicity/private.key -out /root/juicity/fullchain.cer -subj "/CN=bing.com"
 
+# Create config.json
 cat > /root/juicity/config.json <<EOL
 {
   "listen": ":$PORT",
@@ -43,7 +42,7 @@ cat > /root/juicity/config.json <<EOL
 }
 EOL
 
-# Create systemd service file
+# ---- Setup systemd service ----
 cat > /etc/systemd/system/juicity.service <<EOL
 [Unit]
 Description=juicity-server Service
@@ -64,11 +63,11 @@ LimitNOFILE=infinity
 WantedBy=multi-user.target
 EOL
 
-# Reload systemd, enable and start the service
+# ---- Start the service ----
 sudo systemctl daemon-reload
 sudo systemctl enable juicity
 sudo systemctl start juicity
 
-# Generate and print the share link
+# ---- Generate and print the share link ----
 SHARE_LINK=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
 echo "Share Link: $SHARE_LINK"
