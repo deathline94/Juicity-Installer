@@ -63,23 +63,27 @@ print_with_delay ""
 echo ""
 echo ""
 
+#!/bin/bash
+
 # Install required packages
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
 
-# Download and unzip the binary to /root/juicity
-wget -O "/root/juicity-linux-x86_64.zip" "https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
-unzip "/root/juicity-linux-x86_64.zip" -d "/root/juicity"
-
-# Check if the juicity-server binary exists
-if [[ ! -f /root/juicity/juicity-server ]]; then
-    echo "Error: juicity-server binary not found!"
+# Detect OS and download the corresponding release
+OS=$(uname -s)
+if [ "$OS" == "Linux" ]; then
+    BINARY_NAME="juicity-linux-x86_64.zip"
+else
+    echo "Unsupported OS: $OS"
     exit 1
 fi
 
+LATEST_RELEASE_URL=$(curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.[0].assets[] | select(.name == "'$BINARY_NAME'") | .browser_download_url')
 
-# Make the binary executable (assuming it's named juicity-server in the unzipped directory)
-chmod +x /root/juicity/juicity-server
+# Download and extract to /root/juicity
+mkdir -p /root/juicity
+curl -L $LATEST_RELEASE_URL -o /root/juicity/juicity.zip
+unzip /root/juicity/juicity.zip -d /root/juicity
 
 # Delete all files except juicity-server
 find /root/juicity ! -name 'juicity-server' -type f -exec rm -f {} +
