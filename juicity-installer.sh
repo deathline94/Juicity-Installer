@@ -69,21 +69,21 @@ echo ""
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
 
-# Detect OS and download the corresponding release
-OS=$(uname -s)
-if [ "$OS" == "Linux" ]; then
-    BINARY_NAME="juicity-linux-x86_64.zip"
-else
-    echo "Unsupported OS: $OS"
-    exit 1
-fi
+# Define the download link and destination path
+DOWNLOAD_LINK="https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
+DESTINATION_PATH="/root/juicity-linux-x86_64.zip"
 
-curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r ".[0].assets[] | select(.name == \"$BINARY_NAME\") | .browser_download_url"
+# Download the binary using wget
+wget -O $DESTINATION_PATH $DOWNLOAD_LINK
 
-# Download and extract to /root/juicity
-mkdir -p /root/juicity
-curl -L $LATEST_RELEASE_URL -o /root/juicity/juicity.zip
-unzip /root/juicity/juicity.zip -d /root/juicity
+# Unzip the downloaded file to /root/juicity
+unzip $DESTINATION_PATH -d /root/juicity
+
+# Make the binary executable (assuming it's named juicity-server in the unzipped directory)
+chmod +x /root/juicity/juicity-server
+
+# Optionally, you can remove the downloaded zip file after extraction
+rm $DESTINATION_PATH
 
 # Delete all files except juicity-server
 find /root/juicity ! -name 'juicity-server' -type f -exec rm -f {} +
