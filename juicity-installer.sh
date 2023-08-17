@@ -5,7 +5,7 @@ sudo apt-get update
 sudo apt-get install -y unzip curl jq uuid-runtime openssl
 
 # ---- Define directories and URLs ----
-DOWNLOAD_DIR="/home/juicity"
+DOWNLOAD_DIR="/root/juicity"
 DOWNLOAD_LOCATION="$DOWNLOAD_DIR/juicity.zip"
 LATEST_RELEASE_URL="https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
 
