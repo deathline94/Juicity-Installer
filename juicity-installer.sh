@@ -67,16 +67,11 @@ echo ""
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
 
-# Define the download link and destination path
-DOWNLOAD_LINK="https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
-DESTINATION_PATH="/root/juicity-linux-x86_64.zip"
+# Download and unzip the binary to /root/juicity
+wget -O "/root/juicity-linux-x86_64.zip" "https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
+unzip "/root/juicity-linux-x86_64.zip" -d "/root/juicity"
 
-# Download the binary using wget
-wget -O $DESTINATION_PATH $DOWNLOAD_LINK
-
-# Unzip the downloaded file to /root/juicity
-unzip $DESTINATION_PATH -d /root/juicity
-
+# Check if the juicity-server binary exists
 if [[ ! -f /root/juicity/juicity-server ]]; then
     echo "Error: juicity-server binary not found!"
     exit 1
@@ -85,9 +80,6 @@ fi
 
 # Make the binary executable (assuming it's named juicity-server in the unzipped directory)
 chmod +x /root/juicity/juicity-server
-
-# Optionally, you can remove the downloaded zip file after extraction
-rm $DESTINATION_PATH
 
 # Delete all files except juicity-server
 find /root/juicity ! -name 'juicity-server' -type f -exec rm -f {} +
