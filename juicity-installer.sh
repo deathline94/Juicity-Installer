@@ -13,13 +13,13 @@ else
     exit 1
 fi
 
-# Fetch the release page and extract the latest release's asset URL using grep, awk, and sed
-LATEST_RELEASE_URL=$(curl --silent "https://github.com/juicity/juicity/releases/latest" | grep -Eo "https://github.com/juicity/juicity/releases/download/[^\"]+/${BINARY_NAME}\"" | sed 's/\"$//')
+# Direct URL for the latest release asset based on the repository structure
+LATEST_RELEASE_URL="https://github.com/juicity/juicity/releases/latest/download/${BINARY_NAME}"
 
+# Download the binary
+curl -L "$LATEST_RELEASE_URL" -o "/root/juicity/juicity.zip"
 
 # Download and extract to /root/juicity
-mkdir -p /root/juicity
-curl -L $LATEST_RELEASE_URL -o /root/juicity/juicity.zip
 unzip /root/juicity/juicity.zip -d /root/juicity
 
 # Delete all files except juicity-server
