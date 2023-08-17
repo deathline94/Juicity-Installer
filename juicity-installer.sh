@@ -4,27 +4,11 @@
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
 
-# Detect OS and set the appropriate binary name
-OS=$(uname -s)
-case "$OS" in
-    Linux)   BINARY_NAME="juicity-linux-x86_64.zip" ;;
-    Darwin)  BINARY_NAME="juicity-macos-x86_64.zip" ;;
-    Windows_NT) BINARY_NAME="juicity-windows-x86_64.zip" ;; # This might not be the exact string returned by uname on Windows, adjust as necessary
-    *)       echo "Unsupported OS: $OS"; exit 1 ;;
-esac
-
-# Extract the tag_name for the latest release
-LATEST_TAG=$(curl --silent "https://api.github.com/repos/juicity/juicity/releases/latest" | jq -r ".tag_name")
-
-# Fetch detailed information about the latest release using the tag_name
-LATEST_RELEASE_ASSETS=$(curl --silent "https://api.github.com/repos/juicity/juicity/releases/tags/${LATEST_TAG}")
-
-# Extract the download URL of the desired asset
-LATEST_RELEASE_URL=$(echo "$LATEST_RELEASE_ASSETS" | jq -r ".assets[] | select(.name == \"${BINARY_NAME}\") | .browser_download_url")
+# The specific URL you've provided
+LATEST_RELEASE_URL="https://github.com/juicity/juicity/releases/download/v0.1.3/juicity-linux-x86_64.zip"
 
 # Download the binary
 curl -L "$LATEST_RELEASE_URL" -o "/root/juicity/juicity.zip"
-
 
 # Download and extract to /root/juicity
 unzip /root/juicity/juicity.zip -d /root/juicity
