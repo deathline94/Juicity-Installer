@@ -101,7 +101,7 @@ UUID=$(uuidgen)
 openssl ecparam -genkey -name prime256v1 -out /root/juicity/private.key
 
 # Generate certificate using the private key
-openssl req -new -x509 -days 36500 -key /root/juicity/private.key -out /root/juicity/fullchain.cer -subj "/CN=bing.com"
+openssl req -new -x509 -days 36500 -key /root/juicity/private.key -out /root/juicity/fullchain.cer -subj "/CN=www.speedtest.net"
 
 cat > /root/juicity/config.json <<EOL
 {
