@@ -94,7 +94,6 @@ conf() {
   },
   "certificate": "/root/juicity/fullchain.cer",
   "private_key": "/root/juicity/private.key",
-  "allow_insecure": false,
   "congestion_control": "bbr",
   "log_level": "info"
 }
@@ -136,10 +135,6 @@ generate() {
     # Generate and print the share link
     input=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
     protocol=$(echo "$input" | awk -F '://' '{print $1}')
-   # uuid=$(echo "$input" | awk -F '://' '{split($2, arr, ":"); print arr[1]}')
-   # password=$(echo "$input" | awk -F '://' '{split($2, arr, ":"); print arr[2]}' | awk -F '@' '{print $1}')
-    #ip=$(echo "$input" | awk -F '[@:]' '{print $3}')
-    #port=$(echo "$input" | awk -F '[${ip}:]' '{print $4}' | awk -F '?' '{print $1}')
     path_and_query=$(echo "$input" | awk -F '?' '{print $2}' | awk -F '#' '{print $1}')
     hash=$(echo "$input" | awk -F '#' '{print $2}')
     uuid=$(jq -r '.users | keys[0]' "$config_file")
@@ -151,9 +146,6 @@ generate() {
     SHARE_LINK_IP_6="$protocol://${uuid}:${password}@[${ipv6}]${port}/?allow_insecure=true&${path_and_query}#juicity"
 
     # Constructing the modified output
-    #SHARE_LINK_IP_4="${credentials_and_host}:${PASSWORD}@${ipv4}:${PORT}/?allow_insecure=true&${path_and_query}#juicity"
-    #SHARE_LINK_IP_6="${credentials_and_host}:${PASSWORD}@[${ipv6}]:${PORT}/?allow_insecure=true&${path_and_query}#juicity"
-    #SHARE_LINK="${credentials_and_host}/?allow_insecure=true&${path_and_query}#juicity"
     if [ -n "$ipv4" ] && [ -n "$ipv6" ]; then
         echo "You have both IPv4 and IPv6 addresses."
         echo "Choose an option:"
