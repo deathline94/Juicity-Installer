@@ -92,6 +92,7 @@ cat > /root/juicity/config.json <<EOL
   },
   "certificate": "/root/juicity/fullchain.cer",
   "private_key": "/root/juicity/private.key",
+  "allow_insecure": false,
   "congestion_control": "bbr",
   "log_level": "info"
 }
@@ -125,5 +126,14 @@ sudo systemctl start juicity
 sudo systemctl restart juicity
 
 # Generate and print the share link
-SHARE_LINK=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
+input=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
+
+# Extracting parts from the input
+protocol="$(echo $input | cut -d ':' -f 1)"
+credentials_and_host="$(echo $input | cut -d ':' -f 2-)"
+path_and_query="$(echo $credentials_and_host | cut -d '?' -f 2)"
+credentials_and_host="${protocol}:${credentials_and_host%%:*}"
+
+# Constructing the modified output
 echo "Share Link: $SHARE_LINK"
+SHARE_LINK="${protocol}:${credentials_and_host}/?allow_insecure=true&${path_and_query}&#juicity"
