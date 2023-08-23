@@ -6,10 +6,10 @@ Always activate "Allow Insecure" on the client when using the provided share lin
 
 # 📋 Features
 
-    🔧 Automated installation of the Juicity server.
-    🖥️ Supports multiple architectures: x86_64, arm64, armv7, mips32, mips64, riscv64, and x86_32.
-    🔄 Option to modify the listening port of an existing installation.
-    🛡️ Secure uninstallation to completely remove Juicity server and configurations.
+🔧 Automated installation of the Juicity server.
+🖥️ Supports multiple architectures: x86_64, arm64, armv7, mips32, mips64, riscv64, and x86_32.
+🔄 Option to modify the listening port of an existing installation.
+🛡️ Secure uninstallation to completely remove Juicity server and configurations.
 
 # 🚀 Quick Start
 
