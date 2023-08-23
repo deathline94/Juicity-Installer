@@ -1,5 +1,3 @@
-README.md
-
 # Juicity-Installer (PoC)
 
 Juicity-Installer is a command-line tool designed to work specifically on Ubuntu systems. It provides a convenient way to install and configure various components on your Ubuntu machine.
