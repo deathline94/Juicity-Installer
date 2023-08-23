@@ -1,32 +1,36 @@
-# Juicity-Installer (PoC)
+# Juicity Installer
 
-Juicity-Installer is a command-line tool designed to work specifically on Ubuntu systems. It provides a convenient way to install and configure various components on your Ubuntu machine.
+The Juicity Installer is a convenient tool for installing and configuring the Juicity proxy service on your Ubuntu system. Simply follow the instructions below to get started:
 
-## Installation
+1. Install the Juicity Installer by running the following command :
 
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/samsesh/Juicity-Installer/main/juicity-installer.sh)
-```
+   ```
+   bash <(curl -fsSL https://raw.githubusercontent.com/samsesh/Juicity-Installer/main/juicity-installer.sh)
+   ```
 
-This will initiate the installation process and configure your Ubuntu system according to the specified settings.
+1. Once installed, launch the Juicity Installer. It will prompt you to enter the port and SNI (Server Name Indication) for the proxy service.
 
-## Compatibility
+1. Provide the required port and SNI information as requested by the Juicity Installer.
 
-Juicity-Installer is specifically designed for Ubuntu systems and has been tested on the following versions:
-
-- Ubuntu 18.04 LTS
-- Ubuntu 20.04 LTS
-- Ubuntu 22.04 LTS
-
-Please note that Juicity-Installer may not work properly on other Linux distributions or versions.
+Please note that the Juicity Installer is compatible with Ubuntu systems only.
 
 ## Usage
 
- you may consider the following options:
+There are multiple ways to utilize the Juicity service:
 
-- For a web GUI client of Project V with V support, you can use [v2rayA](https://github.com/v2rayA/v2rayA).
-- To use Juicity-Installer on an Android device, you can utilize [NekoBoxForAndroid](https://github.com/MatsuriDayo/NekoBoxForAndroid/releases) along with the [juicity-test-3 plugin](https://github.com/MatsuriDayo/plugins/releases/tag/juicity-test-3).
----
-- If you would like to support the development of Juicity-Installer, you can make a donation through this [link](https://github.com/samsesh/donate/).
+1. **v2rayA**: For system-wide usage, you can integrate Juicity with v2rayA. Follow the instructions in the [v2rayA repository](https://github.com/v2rayA/v2rayA) for integration details.
 
-Thank you for using Juicity-Installer and your support!
+1. **Android Devices**: To use Juicity on your Android device, you can install the NekoBox app from the [NekoBoxForAndroid repository](https://github.com/MatsuriDayo/NekoBoxForAndroid/releases). Additionally, you can enhance the functionality of NekoBox by installing the Juicity plugin from the [plugins repository](https://github.com/MatsuriDayo/plugins/releases/tag/juicity-test-3).
+
+Please note that there is currently no version available for iOS.
+
+## Documentation
+
+For detailed documentation on the Juicity protocol and its features, please refer to the [Juicity repository](https://github.com/juicity/juicity).
+
+## Support
+
+If you find the Juicity project useful, you can show your support by making a donation through the [donation link](https://github.com/samsesh/donate/). Your contribution will be greatly appreciated.
+
+Thank you for choosing Juicity!
+
