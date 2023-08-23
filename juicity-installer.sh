@@ -18,6 +18,8 @@ print_with_delay() {
 }
 
 # Introduction animation
+echo ""
+echo ""
 print_with_delay "juicity-installer by DEATHLINE | @NamelesGhoul" 0.1
 echo ""
 echo ""
