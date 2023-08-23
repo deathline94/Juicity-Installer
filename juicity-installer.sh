@@ -139,8 +139,8 @@ generate() {
     credentials_and_host="${protocol}:${credentials_and_host%%:*}"
 
     # Constructing the modified output
-    echo "Share Link: $SHARE_LINK"
     SHARE_LINK="${protocol}:${credentials_and_host}/?allow_insecure=true&${path_and_query}&#juicity"
+    echo "Share Link: $SHARE_LINK"
 }
 
 service_file="/etc/systemd/system/juicity.service"
