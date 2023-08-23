@@ -33,6 +33,7 @@ for ((i = 0; i < ${#text}; i++)); do
     echo -n -e "\e[${color}m$char\e[0m"
     sleep "$delay"
 done
+echo ""
 
 req() {
     # Install required packages
@@ -129,18 +130,68 @@ EOL
 }
 
 generate() {
+    ipv4=$(curl -s ifconfig.me)
+    ipv6=$(curl -6 ifconfig.co)
+    config_file="/root/juicity/config.json"
     # Generate and print the share link
     input=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
+    protocol=$(echo "$input" | awk -F '://' '{print $1}')
+   # uuid=$(echo "$input" | awk -F '://' '{split($2, arr, ":"); print arr[1]}')
+   # password=$(echo "$input" | awk -F '://' '{split($2, arr, ":"); print arr[2]}' | awk -F '@' '{print $1}')
+    #ip=$(echo "$input" | awk -F '[@:]' '{print $3}')
+    #port=$(echo "$input" | awk -F '[${ip}:]' '{print $4}' | awk -F '?' '{print $1}')
+    path_and_query=$(echo "$input" | awk -F '?' '{print $2}' | awk -F '#' '{print $1}')
+    hash=$(echo "$input" | awk -F '#' '{print $2}')
+    uuid=$(jq -r '.users | keys[0]' "$config_file")
+    password=$(jq -r '.users | .["'${uuid}'"]' "$config_file")
+    port=$(jq -r '.listen' "$config_file")
 
-    # Extracting parts from the input
-    protocol="$(echo $input | cut -d ':' -f 1)"
-    credentials_and_host="$(echo $input | cut -d ':' -f 2-)"
-    path_and_query="$(echo $credentials_and_host | cut -d '?' -f 2)"
-    credentials_and_host="${protocol}:${credentials_and_host%%:*}"
+    # Constructing the new output
+    SHARE_LINK_IP_4="$protocol://${uuid}:${password}@${ipv4}${port}/?allow_insecure=true&${path_and_query}#juicity"
+    SHARE_LINK_IP_6="$protocol://${uuid}:${password}@[${ipv6}]${port}/?allow_insecure=true&${path_and_query}#juicity"
 
     # Constructing the modified output
-    SHARE_LINK="${protocol}:${credentials_and_host}/?allow_insecure=true&${path_and_query}&#juicity"
-    echo "Share Link: $SHARE_LINK"
+    #SHARE_LINK_IP_4="${credentials_and_host}:${PASSWORD}@${ipv4}:${PORT}/?allow_insecure=true&${path_and_query}#juicity"
+    #SHARE_LINK_IP_6="${credentials_and_host}:${PASSWORD}@[${ipv6}]:${PORT}/?allow_insecure=true&${path_and_query}#juicity"
+    #SHARE_LINK="${credentials_and_host}/?allow_insecure=true&${path_and_query}#juicity"
+    if [ -n "$ipv4" ] && [ -n "$ipv6" ]; then
+        echo "You have both IPv4 and IPv6 addresses."
+        echo "Choose an option:"
+        echo "1. Display IPv4 config"
+        echo "2. Display IPv6 config"
+        echo "3. Display both IPv4 and IPv6 config"
+
+        read -p "Enter your choice (1, 2, or 3): " choice
+
+        case $choice in
+        1)
+            echo "IPv4 config:"
+            echo $SHARE_LINK_IP_4
+            ;;
+        2)
+            echo "IPv6 address:"
+            echo $SHARE_LINK_IP_6
+            ;;
+        3)
+            echo "IPv4 config:"
+            echo $SHARE_LINK_IP_4
+            echo ""
+            echo "IPv6 address:"
+            echo $SHARE_LINK_IP_6
+            ;;
+        *)
+            echo "Invalid choice. Exiting."
+            ;;
+        esac
+    elif [ -n "$ipv4" ]; then
+        echo "IPv4 config:"
+        echo $SHARE_LINK_IP_4
+    elif [ -n "$ipv6" ]; then
+        echo "IPv6 address:"
+        echo $SHARE_LINK_IP_6
+    else
+        echo "No IP address found."
+    fi
 }
 
 service_file="/etc/systemd/system/juicity.service"
