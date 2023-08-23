@@ -128,8 +128,6 @@ echo ""
 if [[ -z "$PASSWORD" ]]; then
     PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
     echo "Generated Password: $PASSWORD"
-    echo ""
-    echo ""
 fi
 UUID=$(uuidgen)
 
@@ -178,4 +176,8 @@ sudo systemctl start juicity
 
 # Modified share link output
 SHARE_LINK=$($JUICITY_SERVER generate-sharelink -c $CONFIG_FILE)
-echo "Share Link: $SHARE_LINK"
+echo ""
+echo ""
+echo "$SHARE_LINK"
+echo ""
+echo ""
