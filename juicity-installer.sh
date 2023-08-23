@@ -18,7 +18,7 @@ print_with_delay() {
 }
 
 # Introduction animation
-print_with_delay "juicity-installer by DEATHLINE | @NamelessGhoul" 0.1
+print_with_delay "juicity-installer by DEATHLINE | @NamelesGhoul" 0.1
 
 # Install required packages
 sudo apt-get update > /dev/null 2>&1
