@@ -1,3 +1,4 @@
+[fa🇮🇷](/README.FA.MD)
 # Juicity Installer (PoC)
 
 The Juicity Installer is a convenient tool for installing and configuring the Juicity proxy service on your Ubuntu system. Simply follow the instructions below to get started:
