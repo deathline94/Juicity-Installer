@@ -113,7 +113,7 @@ read -p "Enter listen port (or press enter to randomize between 10000 and 65535)
 [[ -z "$PORT" ]] && PORT=$((RANDOM % 55536 + 10000))
 read -p "Enter password (or press enter to generate one): " PASSWORD
 if [[ -z "$PASSWORD" ]]; then
-    PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&*()' | fold -w 8 | head -n 1)
+    PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
     echo "Generated Password: $PASSWORD"
 fi
 UUID=$(uuidgen)
