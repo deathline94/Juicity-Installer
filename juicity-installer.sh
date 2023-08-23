@@ -19,6 +19,8 @@ print_with_delay() {
 
 # Introduction animation
 print_with_delay "juicity-installer by DEATHLINE | @NamelesGhoul" 0.1
+echo ""
+echo ""
 
 # Install required packages
 sudo apt-get update > /dev/null 2>&1
@@ -27,9 +29,14 @@ sudo apt-get install -y unzip jq uuid-runtime > /dev/null 2>&1
 # Check for an existing installation
 if [[ -d $INSTALL_DIR && -f $SERVICE_FILE ]]; then
     echo "Juicity already installed. Choose an option:"
+    echo ""
+    echo ""
     echo "1. Reinstall"
+    echo ""
     echo "2. Modify"
+    echo ""
     echo "3. Uninstall"
+    echo ""
     read -p "Enter your choice (1/2/3): " choice
 
     case $choice in
@@ -109,9 +116,13 @@ find $INSTALL_DIR ! -name 'juicity-server' -type f -exec rm -f {} +
 chmod +x $JUICITY_SERVER
 
 # Create config.json
+echo ""
 read -p "Enter listen port (or press enter to randomize between 10000 and 65535): " PORT
+echo ""
 [[ -z "$PORT" ]] && PORT=$((RANDOM % 55536 + 10000))
+echo ""
 read -p "Enter password (or press enter to generate one): " PASSWORD
+echo ""
 if [[ -z "$PASSWORD" ]]; then
     PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
     echo "Generated Password: $PASSWORD"
