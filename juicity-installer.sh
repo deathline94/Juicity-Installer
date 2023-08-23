@@ -128,6 +128,8 @@ echo ""
 if [[ -z "$PASSWORD" ]]; then
     PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
     echo "Generated Password: $PASSWORD"
+    echo ""
+    echo ""
 fi
 UUID=$(uuidgen)
 
