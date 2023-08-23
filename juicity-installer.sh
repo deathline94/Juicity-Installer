@@ -4,7 +4,7 @@
 print_with_delay() {
     local text="$1"
     local delay="$2"
-    
+
     for ((i = 0; i < ${#text}; i++)); do
         echo -n "${text:$i:1}"
         sleep "$delay"
@@ -34,57 +34,58 @@ for ((i = 0; i < ${#text}; i++)); do
     sleep "$delay"
 done
 
-echo
+req() {
+    # Install required packages
+    sudo apt-get update
+    sudo apt-get install -y unzip jq uuid-runtime
+}
+install_juicity() {
+    # Detect OS and download the corresponding release
+    OS=$(uname -s)
+    if [ "$OS" == "Linux" ]; then
+        BINARY_NAME="juicity-linux-x86_64.zip"
+    else
+        echo "Unsupported OS: $OS"
+        exit 1
+    fi
 
+    LATEST_RELEASE_URL=$(curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.[0].assets[] | select(.name == "'$BINARY_NAME'") | .browser_download_url')
 
-# Install required packages
-sudo apt-get update
-sudo apt-get install -y unzip jq uuid-runtime
+    # Download and extract to /root/juicity
+    mkdir -p /root/juicity
+    curl -L $LATEST_RELEASE_URL -o /root/juicity/juicity.zip
+    unzip /root/juicity/juicity.zip -d /root/juicity
 
-# Detect OS and download the corresponding release
-OS=$(uname -s)
-if [ "$OS" == "Linux" ]; then
-    BINARY_NAME="juicity-linux-x86_64.zip"
-else
-    echo "Unsupported OS: $OS"
-    exit 1
-fi
+    # Delete all files except juicity-server
+    find /root/juicity ! -name 'juicity-server' -type f -exec rm -f {} +
 
-LATEST_RELEASE_URL=$(curl --silent "https://api.github.com/repos/juicity/juicity/releases" | jq -r '.[0].assets[] | select(.name == "'$BINARY_NAME'") | .browser_download_url')
+    # Set permissions
+    chmod +x /root/juicity/juicity-server
+}
 
-# Download and extract to /root/juicity
-mkdir -p /root/juicity
-curl -L $LATEST_RELEASE_URL -o /root/juicity/juicity.zip
-unzip /root/juicity/juicity.zip -d /root/juicity
+conf() {
+    # Create config.json
+    read -p "Enter listen port (or press enter to randomize): " PORT
+    [[ -z "$PORT" ]] && PORT=$((RANDOM % 65500 + 1))
+    read -p "Enter password: " PASSWORD
+    UUID=$(uuidgen)
 
-# Delete all files except juicity-server
-find /root/juicity ! -name 'juicity-server' -type f -exec rm -f {} +
+    # Generate private key
+    openssl ecparam -genkey -name prime256v1 -out /root/juicity/private.key
 
-# Set permissions
-chmod +x /root/juicity/juicity-server
+    # Generate certificate using the private key
+    # Ask the user for input
+    read -p "Enter sni (or press enter to www.speedtest.net): " sni
 
-# Create config.json
-read -p "Enter listen port (or press enter to randomize): " PORT
-[[ -z "$PORT" ]] && PORT=$((RANDOM % 65500 + 1))
-read -p "Enter password: " PASSWORD
-UUID=$(uuidgen)
+    # Set default value if input is null
+    if [ -z "$sni" ]; then
+        sni="www.speedtest.net"
+    fi
 
-# Generate private key
-openssl ecparam -genkey -name prime256v1 -out /root/juicity/private.key
+    # Generate the certificate
+    openssl req -new -x509 -days 36500 -key /root/juicity/private.key -out /root/juicity/fullchain.cer -subj "/CN=$sni"
 
-# Generate certificate using the private key
-# Ask the user for input
-read -p "Enter sni (or press enter to www.speedtest.net): " sni
-
-# Set default value if input is null
-if [ -z "$sni" ]; then
-    sni="www.speedtest.net"
-fi
-
-# Generate the certificate
-openssl req -new -x509 -days 36500 -key /root/juicity/private.key -out /root/juicity/fullchain.cer -subj "/CN=$sni"
-
-cat > /root/juicity/config.json <<EOL
+    cat >/root/juicity/config.json <<EOL
 {
   "listen": ":$PORT",
   "users": {
@@ -97,9 +98,10 @@ cat > /root/juicity/config.json <<EOL
   "log_level": "info"
 }
 EOL
-
-# Create systemd service file
-cat > /etc/systemd/system/juicity.service <<EOL
+}
+serviceC() {
+    # Create systemd service file
+    cat >/etc/systemd/system/juicity.service <<EOL
 [Unit]
 Description=juicity-server Service
 Documentation=https://github.com/juicity/juicity
@@ -119,21 +121,60 @@ LimitNOFILE=infinity
 WantedBy=multi-user.target
 EOL
 
-# Reload systemd, enable and start the service
-sudo systemctl daemon-reload
-sudo systemctl enable juicity
-sudo systemctl start juicity
-sudo systemctl restart juicity
+    # Reload systemd, enable and start the service
+    sudo systemctl daemon-reload
+    sudo systemctl enable juicity
+    sudo systemctl start juicity
+    sudo systemctl restart juicity
+}
 
-# Generate and print the share link
-input=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
+generate() {
+    # Generate and print the share link
+    input=$(/root/juicity/./juicity-server generate-sharelink -c /root/juicity/config.json)
 
-# Extracting parts from the input
-protocol="$(echo $input | cut -d ':' -f 1)"
-credentials_and_host="$(echo $input | cut -d ':' -f 2-)"
-path_and_query="$(echo $credentials_and_host | cut -d '?' -f 2)"
-credentials_and_host="${protocol}:${credentials_and_host%%:*}"
+    # Extracting parts from the input
+    protocol="$(echo $input | cut -d ':' -f 1)"
+    credentials_and_host="$(echo $input | cut -d ':' -f 2-)"
+    path_and_query="$(echo $credentials_and_host | cut -d '?' -f 2)"
+    credentials_and_host="${protocol}:${credentials_and_host%%:*}"
 
-# Constructing the modified output
-echo "Share Link: $SHARE_LINK"
-SHARE_LINK="${protocol}:${credentials_and_host}/?allow_insecure=true&${path_and_query}&#juicity"
+    # Constructing the modified output
+    echo "Share Link: $SHARE_LINK"
+    SHARE_LINK="${protocol}:${credentials_and_host}/?allow_insecure=true&${path_and_query}&#juicity"
+}
+
+service_file="/etc/systemd/system/juicity.service"
+
+if [ -f "$service_file" ]; then
+    echo "You have already installed the juicity.service script."
+    echo "What would you like to do?"
+    echo "1. View the configuration"
+    echo "2. Remove the script"
+
+    read -p "Enter your choice (1 or 2): " choice
+
+    case $choice in
+    1)
+        generate
+        exit
+        ;;
+    2)
+        systemctl disable juicity
+        systemctl stop juicity
+        systemctl daemon-reload
+        rm -rf "$service_file"
+        rm -rf /root/juicity
+        echo "The juicity.service script has been removed."
+        exit
+        ;;
+    *)
+        echo "Invalid choice. Exiting."
+        ;;
+    esac
+else
+    req
+    install_juicity
+    conf
+    serviceC
+    generate
+fi
