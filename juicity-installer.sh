@@ -1,5 +1,42 @@
 #!/bin/bash
 
+# Function to print characters with delay
+print_with_delay() {
+    local text="$1"
+    local delay="$2"
+    
+    for ((i = 0; i < ${#text}; i++)); do
+        echo -n "${text:$i:1}"
+        sleep "$delay"
+    done
+}
+
+# Introduction animation
+intro_text="juicity-installer by DEATHLINE | nameless ghouls"
+delay=0.1
+
+echo ""
+echo ""
+print_with_delay "$intro_text" "$delay"
+echo ""
+echo ""
+
+# Introduction Rainbow animation
+
+colors=("31" "91" "33" "93" "32" "92" "34" "94" "35" "95" "36" "96")
+text="update by samsesh"
+delay=0.2
+
+for ((i = 0; i < ${#text}; i++)); do
+    color="${colors[$((i % ${#colors[@]}))]}"
+    char="${text:$i:1}"
+    echo -n -e "\e[${color}m$char\e[0m"
+    sleep "$delay"
+done
+
+echo
+
+
 # Install required packages
 sudo apt-get update
 sudo apt-get install -y unzip jq uuid-runtime
